@@ -1,0 +1,7 @@
+packages:
+  ./emulate8086
+
+source-repository-package
+  type: git
+  location: https://github.com/sgraf812/hdis86
+  tag: 98c0aa1647a8dce6c35419e51d31dc5e3583aa25
