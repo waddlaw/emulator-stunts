@@ -1,5 +1,8 @@
 # Stunts Emulator
 
+![stack](https://github.com/haskell-game-archives/emulator-stunts/workflows/stack/badge.svg)
+![cabal](https://github.com/haskell-game-archives/emulator-stunts/workflows/cabal/badge.svg)
+
 A revival of the classic game Stunts 4D Driving with 8086 CPU and DOS emulation in Haskell
 
 ### System Requirements
