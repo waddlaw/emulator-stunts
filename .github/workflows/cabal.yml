@@ -36,19 +36,19 @@ jobs:
       with:
         path: dist-newstyle
         key: ${{ runner.os }}-${{ matrix.ghc }}-v1-cabal-dist
-        
-    # - name: Install libralies
-    #   run: |
-    #     sudo apt-get update
-    #     sudo apt-get install -y
+
+    - name: Install libralies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y freeglut3-dev libxi-dev libxrandr-dev libxcursor-dev libxinerama-dev libopenal-dev libalut-dev
 
     - name: Install dependencies
       run: |
         cabal v2-update
         cabal v2-configure --disable-optimization --write-ghc-environment-files=always -j2
-        cabal v2-build --only-dependencies
+        cabal v2-build emulate8086 --only-dependencies
 
     - name: Build
       run: |
-        cabal v2-build
+        cabal v2-build emulate8086
         cabal v2-install all:exes --overwrite-policy=always

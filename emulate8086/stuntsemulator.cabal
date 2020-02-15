@@ -28,12 +28,12 @@ executable stuntsemulator
     , deepseq
     , directory
     , filepath
-    , GLFW-b        ^>=3.2
+    , GLFW-b        >=3.2  && <3.4
     , Glob          ^>=0.10
     , hdis86
     , lens          >=4.17 && <4.19
     , mtl           ^>=2.2
-    , OpenGLRaw     ^>=3.3
+    , OpenGLRaw     >=3.2  && <3.4
     , transformers
     , vector        ^>=0.12
 
