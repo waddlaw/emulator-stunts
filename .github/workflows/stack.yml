@@ -17,7 +17,8 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-18.04, macos-10.15]
-        resolver: ["lts-14", "nightly"]
+        resolver: ["lts-14", "lts-15", "nightly"]
+        cache-version: ["2020-03-15"]
 
     steps:
     - uses: actions/checkout@v2
@@ -27,10 +28,10 @@ jobs:
       run: stack --version
 
     - name: Cache ~/.stack
-      uses: actions/cache@v1.1.2
+      uses: actions/cache@v1
       with:
         path: ~/.stack
-        key: ${{ runner.os }}-${{ matrix.resolver }}-v1-stack
+        key: ${{ runner.os }}-${{ matrix.resolver }}-${{ matrix.cache-version }}-stack
 
     - name: Install libralies (linux)
       if: runner.os == 'Linux'
@@ -45,9 +46,15 @@ jobs:
         brew install alut
 
     - name: Install dependencies
-      run: stack test --only-dependencies --resolver ${{ matrix.resolver }}
+      env:
+        STACK_YAML: stack-${{ matrix.resolver }}.yaml
+      run: |
+        stack config set resolver ${{ matrix.resolver }}
+        stack test --only-dependencies
 
     - name: Build
+      env:
+        STACK_YAML: stack-${{ matrix.resolver }}.yaml
       run: |
-        stack test --fast --resolver ${{ matrix.resolver }}
-        stack install --fast --resolver ${{ matrix.resolver }}
+        stack test --fast
+        stack install --fast
