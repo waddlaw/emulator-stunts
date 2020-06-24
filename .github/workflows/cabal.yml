@@ -42,7 +42,7 @@ jobs:
       run: |
         cabal update
         cabal configure --disable-optimization --write-ghc-environment-files=always -j2
-        cabal build --only-dependencies
+        cabal build emulate8086 --only-dependencies
 
     - name: Build
       run: |
