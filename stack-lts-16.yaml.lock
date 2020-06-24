@@ -7,9 +7,6 @@ packages:
 - completed:
     size: 53506
     url: https://github.com/sgraf812/hdis86/archive/98c0aa1647a8dce6c35419e51d31dc5e3583aa25.tar.gz
-    cabal-file:
-      size: 3790
-      sha256: 36a04e5eb328cb9128febe120106d09a6613ddbd7ffbe2bd74c75a934e545c22
     name: hdis86
     version: '0.2'
     sha256: c14b9c49ce86147d81da093c7a717af52fe9e194399f030d7bc852851277a19b
@@ -20,7 +17,7 @@ packages:
     url: https://github.com/sgraf812/hdis86/archive/98c0aa1647a8dce6c35419e51d31dc5e3583aa25.tar.gz
 snapshots:
 - completed:
-    size: 491373
-    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/15/3.yaml
-    sha256: 29e9ff61b8bf4b4fcff55cde3ac106ebb971f0d21331dccac9eee63374fa6ca8
-  original: lts-15.3
+    size: 531674
+    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/16/2.yaml
+    sha256: 4b08fb9338ca297de7ade8318f4be1216f14dff8c0426c001fb7886ee88cb84a
+  original: lts-16.2
