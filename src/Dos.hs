@@ -1,4 +1,6 @@
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE ViewPatterns #-}
 
 module Dos where
 
@@ -20,7 +22,7 @@ import qualified Data.Vector.Storable as V
 import Data.Word
 import Helper
 import MachineState
-import Sound.ALUT (($=), pitch, play, sourceGain, stop)
+import Sound.ALUT (pitch, play, sourceGain, stop, ($=))
 import System.Directory
 import System.FilePath (takeFileName)
 import System.FilePath.Glob
@@ -672,10 +674,11 @@ loadExe loadSegment gameExe = do
         + (if bytesInLastPage > 0 then (bytesInLastPage + 0xf) `shiftL` 4 - 0x20 else 0)
         - 0x22f -- ???
     relocationTable =
-      sort $ take (fromIntegral relocationEntries)
-        $ map (\[a, b] -> segAddr b a)
-        $ everyNth 2
-        $ drop (fromIntegral firstRelocationItemOffset `div` 2 - 14) headerLeft
+      sort $
+        take (fromIntegral relocationEntries) $
+          map (\[a, b] -> segAddr b a) $
+            everyNth 2 $
+              drop (fromIntegral firstRelocationItemOffset `div` 2 - 14) headerLeft
 
 unique :: Eq a => [a] -> Bool
 unique xs = length xs == length (nub xs)

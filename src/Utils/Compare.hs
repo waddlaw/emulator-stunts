@@ -1,5 +1,7 @@
-import Control.Applicative
+module Utils.Compare where
+
 import Control.Monad
+import Data.Bifunctor
 import Data.Char
 import Data.Function
 import qualified Data.IntSet as S
@@ -7,10 +9,10 @@ import Data.List
 import Data.Maybe
 import System.IO
 
-my :: [Char]
+my :: String
 my = "LOG.TXT"
 
-ref :: [Char]
+ref :: String
 ref = "../restunts/stunts/LOGCPU0.TXT"
 
 ints :: IO ()
