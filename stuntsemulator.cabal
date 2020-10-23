@@ -12,18 +12,24 @@ license:            BSD-3-Clause
 license-file:       LICENSE
 stability:          experimental
 build-type:         Simple
-tested-with:        GHC ==8.6.5 || ==8.8.3 || ==8.10.1
+tested-with:        GHC ==8.6.5 || ==8.8.4 || ==8.10.2
 extra-source-files:
-  Utils/Compare.hs
-  Utils/Parse.hs
+  src/Utils/Compare.hs
+  src/Utils/Parse.hs
 
-executable stuntsemulator
-  hs-source-dirs:     .
-  main-is:            Main.hs
+common common
   build-depends:
-    , ALUT          ^>=2.4
-    , base          >=4.12 && <4.15
-    , bytestring    ^>=0.10
+    , ALUT        ^>=2.4
+    , base        >=4.12 && <4.15
+    , bytestring  >=0.10 && <0.12
+
+  ghc-options:      -Wall
+  default-language: Haskell2010
+
+library
+  import:          common
+  hs-source-dirs:  src
+  build-depends:
     , containers    ^>=0.6
     , deepseq       ^>=1.4
     , directory     ^>=1.3
@@ -37,7 +43,8 @@ executable stuntsemulator
     , transformers  ^>=0.5
     , vector        ^>=0.12
 
-  other-modules:
+  -- cabal-fmt: expand src -Utils.Compare -Utils.Parse
+  exposed-modules:
     CPU
     DeBruijn
     Dos
@@ -47,23 +54,8 @@ executable stuntsemulator
     Helper
     MachineState
 
-  ghc-options:        -Wall
-  default-extensions:
-    NoMonomorphismRestriction
-    BangPatterns
-    DataKinds
-    FlexibleContexts
-    FlexibleInstances
-    GADTs
-    LambdaCase
-    MultiParamTypeClasses
-    PatternGuards
-    PatternSynonyms
-    RankNTypes
-    RecordWildCards
-    RecursiveDo
-    ScopedTypeVariables
-    TypeFamilies
-    ViewPatterns
-
-  default-language:   Haskell2010
+executable stuntsemulator
+  import:        common
+  main-is:       app/Main.hs
+  build-depends: stuntsemulator
+  ghc-options:   -O2

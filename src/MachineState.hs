@@ -1,3 +1,5 @@
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE TemplateHaskell #-}
 
 module MachineState where
@@ -71,12 +73,9 @@ stepsCounter :: (IO Int, Int -> IO ())
 stepsCounter = refPart _stepsCounter
 
 _showReads, _showReads' :: IORef Bool
-
 _showOffset, _stepsCounter :: IORef Int
-
 {-# NOINLINE _showReads #-}
 _showReads = unsafePerformIO $ newIORef False
-
 {-# NOINLINE _showReads' #-}
 _showReads' = unsafePerformIO $ newIORef False
 

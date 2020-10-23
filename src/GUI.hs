@@ -1,3 +1,5 @@
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE TypeApplications #-}
 
 module GUI
@@ -46,67 +48,71 @@ drawWithFrameBuffer changeSt interrupt' draw = do
             addr = offs + 320 * y + x
         val <- U.read fb addr
         return (addr, val)
-  setCursorEnterCallback window $ Just $ \_ -> \case
-    CursorState'NotInWindow -> modifyMVar_ pos $ const $ return Nothing
-    _ -> return ()
-  setCursorPosCallback window $ Just $ \_ x_ y_ -> do
-    _ <- use'' id
-    let x = round x_ `div` 3
-        y = round y_ `div` 3
-    when (0 <= x && x < 320 && 0 <= y && y < 200) $ do
-      modifyMVar_ pos $ const $ return $ Just ((x, y), Nothing)
-  GLFW.setKeyCallback window $ Just $ \_ key _ action _ -> do
-    let send (press, release) = case action of
-          GLFW.KeyState'Pressed -> interrupt' $ AskKeyInterrupt press
-          GLFW.KeyState'Released -> interrupt' $ AskKeyInterrupt release
-          _ -> return ()
+  setCursorEnterCallback window $
+    Just $ \_ -> \case
+      CursorState'NotInWindow -> modifyMVar_ pos $ const $ return Nothing
+      _ -> return ()
+  setCursorPosCallback window $
+    Just $ \_ x_ y_ -> do
+      _ <- use'' id
+      let x = round x_ `div` 3
+          y = round y_ `div` 3
+      when (0 <= x && x < 320 && 0 <= y && y < 200) $ do
+        modifyMVar_ pos $ const $ return $ Just ((x, y), Nothing)
+  GLFW.setKeyCallback window $
+    Just $ \_ key _ action _ -> do
+      let send (press, release) = case action of
+            GLFW.KeyState'Pressed -> interrupt' $ AskKeyInterrupt press
+            GLFW.KeyState'Released -> interrupt' $ AskKeyInterrupt release
+            _ -> return ()
 
-    when (action /= GLFW.KeyState'Repeating) $ case key of
-      Key'Escape -> send (0x01, 0x81)
-      Key'Space -> send (0x39, 0xb9)
-      Key'Enter -> send (0xe01c, 0x9c)
-      Key'C -> send (0x2e, 0xae)
-      Key'Left -> send (0xe04b, 0xcb)
-      Key'Right -> send (0xe04d, 0xcd)
-      Key'Up -> send (0xe048, 0xc8)
-      Key'Down -> send (0xe050, 0xd0)
-      _ -> return ()
-    when (action /= GLFW.KeyState'Released) $ case key of
-      Key'R -> setOVar $ const videoMem
-      Key'A -> setOVar (+ dof)
-      Key'S -> setOVar (+ (- dof))
-      Key'X -> setOVar (+ 2 * 320)
-      Key'Y -> setOVar (+ (-2 * 320))
-      Key'B -> setOVar (+ 4)
-      Key'V -> setOVar (+ (-4))
-      Key'0 -> sett $ const 0.5
-      Key'1 -> sett $ const 1
-      Key'2 -> sett $ const 5
-      Key'3 -> sett $ const 10
-      Key'4 -> sett $ const 50
-      Key'5 -> sett $ const 100
-      Key'6 -> sett $ const 500
-      Key'7 -> sett $ const 1000
-      Key'8 -> sett $ const 5000
-      Key'9 -> sett $ const 10000
-      Key'N -> sett (* (1 / 1.1))
-      Key'M -> sett (* 1.1)
-      Key'Comma -> modifyMVar_ esds $ return . not
-      Key'T -> showReads .%= not
-      Key'I -> showReads' .%= not
-      Key'U -> changeSt $ showCache ..%= not
-      Key'P -> changeSt $ speed ..%= (3000 -)
-      Key'W -> changeSt adjustCache
-      Key'Q -> GLFW.setWindowShouldClose window True
-      _ -> return ()
+      when (action /= GLFW.KeyState'Repeating) $ case key of
+        Key'Escape -> send (0x01, 0x81)
+        Key'Space -> send (0x39, 0xb9)
+        Key'Enter -> send (0xe01c, 0x9c)
+        Key'C -> send (0x2e, 0xae)
+        Key'Left -> send (0xe04b, 0xcb)
+        Key'Right -> send (0xe04d, 0xcd)
+        Key'Up -> send (0xe048, 0xc8)
+        Key'Down -> send (0xe050, 0xd0)
+        _ -> return ()
+      when (action /= GLFW.KeyState'Released) $ case key of
+        Key'R -> setOVar $ const videoMem
+        Key'A -> setOVar (+ dof)
+        Key'S -> setOVar (+ (- dof))
+        Key'X -> setOVar (+ 2 * 320)
+        Key'Y -> setOVar (+ (-2 * 320))
+        Key'B -> setOVar (+ 4)
+        Key'V -> setOVar (+ (-4))
+        Key'0 -> sett $ const 0.5
+        Key'1 -> sett $ const 1
+        Key'2 -> sett $ const 5
+        Key'3 -> sett $ const 10
+        Key'4 -> sett $ const 50
+        Key'5 -> sett $ const 100
+        Key'6 -> sett $ const 500
+        Key'7 -> sett $ const 1000
+        Key'8 -> sett $ const 5000
+        Key'9 -> sett $ const 10000
+        Key'N -> sett (* (1 / 1.1))
+        Key'M -> sett (* 1.1)
+        Key'Comma -> modifyMVar_ esds $ return . not
+        Key'T -> showReads .%= not
+        Key'I -> showReads' .%= not
+        Key'U -> changeSt $ showCache ..%= not
+        Key'P -> changeSt $ speed ..%= (3000 -)
+        Key'W -> changeSt adjustCache
+        Key'Q -> GLFW.setWindowShouldClose window True
+        _ -> return ()
 
   -- create back buffer
   (tex, fbo) <- mkBackBuffer
 
   tv <- newEmptyMVar
-  _ <- forkIO $ forever $ do
-    threadDelay $ 1000000 `div` 20
-    putMVar tv ()
+  _ <- forkIO $
+    forever $ do
+      threadDelay $ 1000000 `div` 20
+      putMVar tv ()
   let mainLoop = do
         b <- GLFW.windowShouldClose window
         unless b $ do
@@ -120,17 +126,18 @@ drawWithFrameBuffer changeSt interrupt' draw = do
           (vec, post) <-
             if b'
               then do
-                return $ (,) showBuffer $ do
-                  U.set showBuffer 0
-                  when (st ^. showCache) $ do
-                    ca <- use' cache
-                    forM_ (IM.toList $ fst $ IM.split (offs + 320 * 200) $ snd $ IM.split (offs -1) ca) $ \case
-                      (_, Compiled _ _ _ es' ds' _ r _) -> forM_ r $ \(beg, end) ->
-                        forM_ [max 0 $ beg - offs .. min (320 * 200 - 1) $ end - 1 - offs] $ \i -> do
-                          U.unsafeWrite showBuffer i $ maybe 0xffff0000 ((.|. 0x0000ff00) . (`shiftL` 16) . fromIntegral) (if esds' then es' else ds')
-                      (k, DontCache _) -> do
-                        U.unsafeWrite showBuffer (k - offs) 0xffff0000
-                      _ -> return ()
+                return $
+                  (,) showBuffer $ do
+                    U.set showBuffer 0
+                    when (st ^. showCache) $ do
+                      ca <- use' cache
+                      forM_ (IM.toList $ fst $ IM.split (offs + 320 * 200) $ snd $ IM.split (offs -1) ca) $ \case
+                        (_, Compiled _ _ _ es' ds' _ r _) -> forM_ r $ \(beg, end) ->
+                          forM_ [max 0 $ beg - offs .. min (320 * 200 - 1) $ end - 1 - offs] $ \i -> do
+                            U.unsafeWrite showBuffer i $ maybe 0xffff0000 ((.|. 0x0000ff00) . (`shiftL` 16) . fromIntegral) (if esds' then es' else ds')
+                        (k, DontCache _) -> do
+                          U.unsafeWrite showBuffer (k - offs) 0xffff0000
+                        _ -> return ()
               else do
                 let p = st ^. palette
                 v <- S.unsafeFreeze fb

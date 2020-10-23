@@ -1,18 +1,20 @@
 # Stunts Emulator
 
-![stack](https://github.com/haskell-game-archives/emulator-stunts/workflows/stack/badge.svg)
-![cabal](https://github.com/haskell-game-archives/emulator-stunts/workflows/cabal/badge.svg)
-![lint](https://github.com/haskell-game-archives/emulator-stunts/workflows/lint/badge.svg)
+[![stack](https://github.com/haskell-game-archives/emulator-stunts/workflows/stack/badge.svg)](https://github.com/haskell-game-archives/emulator-stunts/actions?query=workflow%3Astack)
+[![cabal](https://github.com/haskell-game-archives/emulator-stunts/workflows/cabal/badge.svg)](https://github.com/haskell-game-archives/emulator-stunts/actions?query=workflow%3Acabal)
+[![lint](https://github.com/haskell-game-archives/emulator-stunts/workflows/lint/badge.svg)](https://github.com/haskell-game-archives/emulator-stunts/actions?query=workflow%3Alint)
 
 A revival of the classic game Stunts 4D Driving with 8086 CPU and DOS emulation in Haskell
 
 ### System Requirements
+
 - OS: Windows/Linux/OSX
 - Graphics: OpenGL 3.3 or better
 
 ## Setup
 
 #### 1. On **Linux** install the following libraries.
+
    i.e. on Ubuntu:
    ```
    sudo apt install libgl1-mesa-dev libxi-dev libxcursor-dev libxinerama-dev libxrandr-dev zlib1g-dev libpulse-dev libalut-dev libopenal-dev
@@ -32,9 +34,7 @@ A revival of the classic game Stunts 4D Driving with 8086 CPU and DOS emulation 
 To compile you will need [Haskell Stack](https://docs.haskellstack.org/en/stable/README/).
 
 ```
-stack setup
-stack build
-stack exec stuntsemulator
+stack run stuntsemulator
 ```
 
 ![Haskell emulated stunts](https://raw.githubusercontent.com/csabahruska/emulator-stunts/master/emulator-stunts.jpg)

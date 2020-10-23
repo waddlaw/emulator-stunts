@@ -1,6 +1,4 @@
-resolver: nightly-2020-06-22 # ghc-8.10.1
-packages:
-- 'emulate8086'
+resolver: nightly-2020-10-23 # ghc-8.10.2
 extra-deps:
 - github: sgraf812/hdis86
   commit: 98c0aa1647a8dce6c35419e51d31dc5e3583aa25

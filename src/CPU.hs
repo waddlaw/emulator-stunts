@@ -1,3 +1,11 @@
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE NoMonomorphismRestriction #-}
+
 module CPU where
 
 import Control.Monad
@@ -66,21 +74,22 @@ fetchBlock_ ::
 fetchBlock_ jumps fetch cs ss es ds ip =
   ( 1,
     [(ips, ips + 1)],
-    IM.singleton (fromIntegral ip) $ Loc ip $
-      fetchBlock'
-        IM.empty
-        jumps
-        fetch
-        cs
-        ip
-        ss
-        (maybe (Get Es) C es)
-        (maybe (Get Ds) C ds)
-        (Get OF)
-        (Get SF)
-        (Get ZF)
-        (Get PF)
-        (Get CF)
+    IM.singleton (fromIntegral ip) $
+      Loc ip $
+        fetchBlock'
+          IM.empty
+          jumps
+          fetch
+          cs
+          ip
+          ss
+          (maybe (Get Es) C es)
+          (maybe (Get Ds) C ds)
+          (Get OF)
+          (Get SF)
+          (Get ZF)
+          (Get PF)
+          (Get CF)
   )
   where
     ips = segAddr cs ip
@@ -280,9 +289,10 @@ fetchBlock' visited jumps fetch cs ip ss es ds oF sF zF pF cF = case IM.lookup (
       ExpM Jump'
     withSize getTr setTr alx ahd axd = case inOpcode of
       Imov -> c $ setTr op1 op2v
-      Ixchg -> c $ letMC' op1v $ \o1 -> do
-        setTr op1 op2v
-        setTr op2 o1
+      Ixchg -> c $
+        letMC' op1v $ \o1 -> do
+          setTr op1 op2v
+          setTr op2 o1
       Inot -> c $ setTr op1 $ Not op1v
       Isal -> shiftOp $ \_ x -> (highBit x, ShiftL x)
       Ishl -> shiftOp $ \_ x -> (highBit x, ShiftL x)
@@ -334,9 +344,10 @@ fetchBlock' visited jumps fetch cs ip ss es ds oF sF zF pF cF = case IM.lookup (
         op1v = getTr op1
         op2v = getTr op2
         divide :: (Integral a, Integral c, Integral (X2 c)) => (Exp a -> Exp c) -> (Exp (X2 a) -> Exp (X2 c)) -> ExpM Jump'
-        divide signed1 signed2 = c $ letMC' (QuotRem (signed2 $ Get axd) (convert $ signed1 op1v)) $ \t -> do
-          set alx $ Convert $ Fst t
-          set ahd $ Convert $ Snd t
+        divide signed1 signed2 = c $
+          letMC' (QuotRem (signed2 $ Get axd) (convert $ signed1 op1v)) $ \t -> do
+            set alx $ Convert $ Fst t
+            set ahd $ Convert $ Snd t
         multiply :: forall c. (Integral c, Integral (X2 c), Bits (X2 c)) => (Exp a -> Exp c) -> ExpM Jump'
         multiply signed' =
           letM (mul (extend $ signed' $ Get alx) (extend $ signed' op1v)) >>= \r ->
@@ -351,15 +362,16 @@ fetchBlock' visited jumps fetch cs ip ss es ds oF sF zF pF cF = case IM.lookup (
             (Exp Bool, Exp b)
           ) ->
           ExpM Jump'
-        shiftOp op = letM (and' (C 0x1f) $ getByteOperand op2) >>= \n ->
-          ifM' (eq' (C 0) n) cc $ do
-            letM (iterate' (convert n) (uncurry Tuple . uncurry op . unTup) $ Tuple cF op1v) >>= \t -> do
-              let r = snd' t
-              setTr op1 r
-              if inOpcode `elem` [Isal, Isar, Ishl, Ishr]
-                then ccF (uSet' OF oF) (highBit r) (Eq (C 0) r) (EvenParity $ Convert r) (fst' t)
-                else -- [Ircl, Ircr, Irol, Iror]
-                  ccF (uSet' OF oF) (uSet' SF sF) (uSet' ZF zF) (uSet' PF pF) (fst' t)
+        shiftOp op =
+          letM (and' (C 0x1f) $ getByteOperand op2) >>= \n ->
+            ifM' (eq' (C 0) n) cc $ do
+              letM (iterate' (convert n) (uncurry Tuple . uncurry op . unTup) $ Tuple cF op1v) >>= \t -> do
+                let r = snd' t
+                setTr op1 r
+                if inOpcode `elem` [Isal, Isar, Ishl, Ishr]
+                  then ccF (uSet' OF oF) (highBit r) (Eq (C 0) r) (EvenParity $ Convert r) (fst' t)
+                  else -- [Ircl, Ircr, Irol, Iror]
+                    ccF (uSet' OF oF) (uSet' SF sF) (uSet' ZF zF) (uSet' PF pF) (fst' t)
         twoOp :: Bool -> (forall b. (Integral b, Bits b) => Exp b -> Exp b -> Exp b) -> ExpM Jump'
         twoOp store op = twoOp_ op (if store then setTr op1 else const $ return ()) op1v op2v
         twoOp_ ::
@@ -452,10 +464,11 @@ fetchBlock' visited jumps fetch cs ip ss es ds oF sF zF pF cF = case IM.lookup (
         RSP -> SP
         _ -> undefined
       x -> error $ "reg: " ++ show x
-    segmentPrefix s' = getReg $ RegSeg $ case filter (not . rep) inPrefixes of
-      [Seg s] -> s
-      [] -> s'
-      _ -> undefined
+    segmentPrefix s' = getReg $
+      RegSeg $ case filter (not . rep) inPrefixes of
+        [Seg s] -> s
+        [] -> s'
+        _ -> undefined
     addressOf :: Memory -> Exp Int
     addressOf m = segAddr_ (segmentPrefix s) (addressOf' m)
       where

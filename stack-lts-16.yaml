@@ -1,6 +1,4 @@
-resolver: lts-16.2 # ghc-8.8.3
-packages:
-- 'emulate8086'
+resolver: lts-16.18 # ghc-8.8.4
 extra-deps:
 - github: sgraf812/hdis86
   commit: 98c0aa1647a8dce6c35419e51d31dc5e3583aa25

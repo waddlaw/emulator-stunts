@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE NoMonomorphismRestriction #-}
 
-module Parse
+module Utils.Parse
   ( getLabels,
   )
 where

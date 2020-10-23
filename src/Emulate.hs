@@ -1,4 +1,10 @@
 {-# LANGUAGE BangPatterns #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE ViewPatterns #-}
 
 module Emulate where
 
@@ -69,14 +75,15 @@ fetchBlock_' _ f cs' ss' es' ds' ip' = do
   _ <- evaluate n
   let !cc = spTrans $ convExpM $ snd $ head $ IM.toList e
       !dd = evalExpM' cc
-  return $ Compiled (not $ highAddr $ segAddr cs' ip') cs' ss' es' ds' n r $ do
-    _ <- dd
-    b <- use' showReads
-    when b $ do
-      off <- use' showOffset
-      forM_ r $ \(beg, end) -> forM_ [max 0 $ beg - off .. min (320 * 200 - 1) $ end - 1 - off] $ \i -> do
-        x <- U.unsafeRead showBuffer i
-        U.unsafeWrite showBuffer i $ x .|. 0xff000000
+  return $
+    Compiled (not $ highAddr $ segAddr cs' ip') cs' ss' es' ds' n r $ do
+      _ <- dd
+      b <- use' showReads
+      when b $ do
+        off <- use' showOffset
+        forM_ r $ \(beg, end) -> forM_ [max 0 $ beg - off .. min (320 * 200 - 1) $ end - 1 - off] $ \i -> do
+          x <- U.unsafeRead showBuffer i
+          U.unsafeWrite showBuffer i $ x .|. 0xff000000
 
 fetchBlock :: Cache -> Machine CacheEntry
 fetchBlock ca = do
@@ -183,7 +190,7 @@ evalPart__ = \case
 
 data Env :: List * -> * where
   Empty :: Env 'Nil
-  Push :: {getPushEnv :: Env env, getPushVal :: t} -> Env ('Con t env)
+  Push :: {getPushEnv :: Env env, getPushVal :: t} -> Env ( 'Con t env)
 
 prj :: Var env t -> Env env -> t
 prj VarZ = getPushVal
@@ -199,7 +206,7 @@ iff :: p -> p -> Bool -> p
 iff x _ True = x
 iff _ y _ = y
 
-pushVal :: Machine' ('Con b e) a -> b -> Machine' e a
+pushVal :: Machine' ( 'Con b e) a -> b -> Machine' e a
 pushVal (ReaderT m) v = ReaderT $ \x -> m (x `Push` v)
 
 {-# NOINLINE evalExp #-}
@@ -251,7 +258,7 @@ evalExp (Snd p) = snd <$> evalExp p
 evalExpM' :: EExpM 'Nil Jump' -> IO ()
 evalExpM' e = let !m = evalExpM mempty e in runReaderT m Empty >>= \(JumpAddr c i) -> cs ..= c >> ip ..= i
 
-liftMa :: Machine' e a -> Machine' ('Con x e) a
+liftMa :: Machine' e a -> Machine' ( 'Con x e) a
 liftMa (ReaderT f) = ReaderT $ f . getPushEnv
 
 {-# NOINLINE evalExpM #-}
@@ -376,13 +383,13 @@ checkInt' n fail' cont = do
           let ibit = \case
                 AskTimerInterrupt {} -> 0
                 AskKeyInterrupt {} -> 1
-              getFirst [] = (cont, [])
-              getFirst (x : xs) = case x of
-                AskTimerInterrupt c | c /= cc -> getFirst xs
-                _ | testBit mask' $ ibit x -> (m, x : xs') where (m, xs') = getFirst xs
+              getFirst' [] = (cont, [])
+              getFirst' (x : xs) = case x of
+                AskTimerInterrupt c | c /= cc -> getFirst' xs
+                _ | testBit mask' $ ibit x -> (m, x : xs') where (m, xs') = getFirst' xs
                 AskTimerInterrupt _ -> (fail', x : xs)
                 AskKeyInterrupt _ -> (fail', x : xs)
-              (now, later) = getFirst ints
+              (now, later) = getFirst' ints
           lift $ putMVar ivar later
           now
 
@@ -405,13 +412,13 @@ checkInt cycles cont n = do
         let ibit = \case
               AskTimerInterrupt {} -> 0
               AskKeyInterrupt {} -> 1
-            getFirst [] = (return (), [])
-            getFirst (x : xs) = case x of
-              AskTimerInterrupt c | c /= cc -> getFirst xs
-              _ | testBit mask' $ ibit x -> (m, x : xs') where (m, xs') = getFirst xs
+            getFirst' [] = (return (), [])
+            getFirst' (x : xs) = case x of
+              AskTimerInterrupt c | c /= cc -> getFirst' xs
+              _ | testBit mask' $ ibit x -> (m, x : xs') where (m, xs') = getFirst' xs
               AskTimerInterrupt _ -> (timerOn ...= False >> interrupt 0x08, xs)
               AskKeyInterrupt scancode -> (keyDown ...= scancode >> interrupt 0x09, xs)
-            (now, later) = getFirst ints
+            (now, later) = getFirst' ints
         putMVar ivar later
         now
       when (ns' < cycles) cont
@@ -452,16 +459,17 @@ loadCache getInst = do
       fromIntegral' x = Just $ fromIntegral x
       fromIntegral_ :: Int -> Word16
       fromIntegral_ = fromIntegral
-  cf' <- cf `deepseq` do
-    let ca = mempty :: Cache
-    forM (IM.toList cf) $
-      \( ip',
-         ( fromIntegral_ -> cs',
-           fromIntegral_ -> ss',
-           fromIntegral' -> es',
-           fromIntegral' -> ds'
-           )
-         ) -> (,) ip' <$> fetchBlock_' ca (disassemble . getInst) cs' ss' es' ds' (fromIntegral $ ip' - segAddr cs' 0)
+  cf' <-
+    cf `deepseq` do
+      let ca = mempty :: Cache
+      forM (IM.toList cf) $
+        \( ip',
+           ( fromIntegral_ -> cs',
+             fromIntegral_ -> ss',
+             fromIntegral' -> es',
+             fromIntegral' -> ds'
+             )
+           ) -> (,) ip' <$> fetchBlock_' ca (disassemble . getInst) cs' ss' es' ds' (fromIntegral $ ip' - segAddr cs' 0)
   cache .%= IM.union (IM.fromList cf')
   cache2 .%= IM.unionWith IS.union jumps
   trace_' "ok"

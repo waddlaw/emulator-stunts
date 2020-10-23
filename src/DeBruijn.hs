@@ -1,3 +1,10 @@
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE ViewPatterns #-}
+
 module DeBruijn
   ( convExpM,
     spTrans,
@@ -13,13 +20,13 @@ import Unsafe.Coerce
 
 data Layout :: List * -> List * -> * where
   EmptyLayout :: Layout env 'Nil
-  PushLayout :: Layout env env' -> Var env t -> Layout env ('Con t env')
+  PushLayout :: Layout env env' -> Var env t -> Layout env ( 'Con t env')
 
 size :: Layout env env' -> Int
 size EmptyLayout = 0
 size (PushLayout lyt _) = size lyt + 1
 
-inc :: Layout env env' -> Layout ('Con t env) env'
+inc :: Layout env env' -> Layout ( 'Con t env) env'
 inc EmptyLayout = EmptyLayout
 inc (PushLayout lyt ix) = PushLayout (inc lyt) (VarS ix)
 
@@ -51,10 +58,10 @@ convExpM = convM EmptyLayout
 
 ----------------------------
 
-lift' :: EExp e a -> EExp ('Con x e) a
+lift' :: EExp e a -> EExp ( 'Con x e) a
 lift' = lift'' VarS
 
-incV :: (Var e a -> Var f a) -> Var ('Con x e) a -> Var ('Con x f) a
+incV :: (Var e a -> Var f a) -> Var ( 'Con x e) a -> Var ( 'Con x f) a
 incV _ VarZ = VarZ
 incV f (VarS x) = VarS $ f x
 
