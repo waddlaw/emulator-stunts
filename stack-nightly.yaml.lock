@@ -17,7 +17,7 @@ packages:
     url: https://github.com/sgraf812/hdis86/archive/98c0aa1647a8dce6c35419e51d31dc5e3583aa25.tar.gz
 snapshots:
 - completed:
-    size: 541635
-    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/nightly/2020/10/23.yaml
-    sha256: ff158a60ee503b3e282295412894bc01337006cc8f5ab3a55daba0b196bd7288
-  original: nightly-2020-10-23
+    size: 554192
+    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/nightly/2020/11/22.yaml
+    sha256: fd51ee29ff5c7fa83060a2189570e078e59ddaefd4a44f3cf23667b8b903e780
+  original: nightly-2020-11-22

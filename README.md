@@ -3,6 +3,7 @@
 [![stack](https://github.com/haskell-game-archives/emulator-stunts/workflows/stack/badge.svg)](https://github.com/haskell-game-archives/emulator-stunts/actions?query=workflow%3Astack)
 [![cabal](https://github.com/haskell-game-archives/emulator-stunts/workflows/cabal/badge.svg)](https://github.com/haskell-game-archives/emulator-stunts/actions?query=workflow%3Acabal)
 [![lint](https://github.com/haskell-game-archives/emulator-stunts/workflows/lint/badge.svg)](https://github.com/haskell-game-archives/emulator-stunts/actions?query=workflow%3Alint)
+[![format](https://github.com/haskell-game-archives/emulator-stunts/workflows/format/badge.svg)](https://github.com/haskell-game-archives/emulator-stunts/actions?query=workflow%3Aformat)
 
 A revival of the classic game Stunts 4D Driving with 8086 CPU and DOS emulation in Haskell
 
