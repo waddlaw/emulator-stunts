@@ -270,10 +270,10 @@ type Part = Part_ Exp
 data List a = Con a (List a) | Nil
 
 data Var :: List * -> * -> * where
-  VarZ :: Var ( 'Con a e) a
-  VarS :: Var e a -> Var ( 'Con b e) a
+  VarZ :: Var ('Con a e) a
+  VarS :: Var e a -> Var ('Con b e) a
 
-newtype DB e a b = DB {getDB :: EExp ( 'Con a e) b}
+newtype DB e a b = DB {getDB :: EExp ('Con a e) b}
 
 type EExp e = Exp_ (Var e) (DB e)
 
@@ -424,6 +424,6 @@ type ExpM = ExM FunM
 
 -------------------------- DeBruijn
 
-newtype DBM e a b = DBM {getDBM :: EExpM ( 'Con a e) b}
+newtype DBM e a b = DBM {getDBM :: EExpM ('Con a e) b}
 
 type EExpM e = ExpM_ (EExp e) (DBM e)
