@@ -190,7 +190,7 @@ evalPart__ = \case
 
 data Env :: List * -> * where
   Empty :: Env 'Nil
-  Push :: {getPushEnv :: Env env, getPushVal :: t} -> Env ( 'Con t env)
+  Push :: {getPushEnv :: Env env, getPushVal :: t} -> Env ('Con t env)
 
 prj :: Var env t -> Env env -> t
 prj VarZ = getPushVal
@@ -206,7 +206,7 @@ iff :: p -> p -> Bool -> p
 iff x _ True = x
 iff _ y _ = y
 
-pushVal :: Machine' ( 'Con b e) a -> b -> Machine' e a
+pushVal :: Machine' ('Con b e) a -> b -> Machine' e a
 pushVal (ReaderT m) v = ReaderT $ \x -> m (x `Push` v)
 
 {-# NOINLINE evalExp #-}
@@ -258,7 +258,7 @@ evalExp (Snd p) = snd <$> evalExp p
 evalExpM' :: EExpM 'Nil Jump' -> IO ()
 evalExpM' e = let !m = evalExpM mempty e in runReaderT m Empty >>= \(JumpAddr c i) -> cs ..= c >> ip ..= i
 
-liftMa :: Machine' e a -> Machine' ( 'Con x e) a
+liftMa :: Machine' e a -> Machine' ('Con x e) a
 liftMa (ReaderT f) = ReaderT $ f . getPushEnv
 
 {-# NOINLINE evalExpM #-}
