@@ -1,4 +1,4 @@
-resolver: nightly-2020-11-22 # ghc-8.10.2
+resolver: nightly-2021-01-03 # ghc-8.10.3
 extra-deps:
 - github: sgraf812/hdis86
   commit: 98c0aa1647a8dce6c35419e51d31dc5e3583aa25
