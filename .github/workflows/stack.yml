@@ -36,12 +36,16 @@ jobs:
 
     - name: Install libralies (mac)
       if: runner.os == 'macOS'
-      # workaround: https://github.com/actions/virtual-environments/issues/1811
       run: |
-        brew untap local/homebrew-openssl
-        brew untap local/homebrew-python2
         brew update
         brew install alut
+
+    # See: https://github.com/actions/cache/issues/445
+    - name: Install GNU tar
+      if: runner.os == 'macOS'
+      run: |
+        brew install gnu-tar
+        echo "/usr/local/opt/gnu-tar/libexec/gnubin" >> $GITHUB_PATH
 
     - name: Cache ~/.stack
       uses: actions/cache@v2
