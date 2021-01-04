@@ -17,11 +17,11 @@ jobs:
       matrix:
         ghc: ["8.6", "8.8", "8.10"]
         cabal: ["3.2"]
-        cache-version: ["2020-11-22"]
+        cache-version: ["2021-01-04"]
 
     steps:
     - uses: actions/checkout@v2
-    - uses: actions/setup-haskell@v1
+    - uses: haskell/actions/setup@v1
       with:
         ghc-version: ${{ matrix.ghc }}
         cabal-version: ${{ matrix.cabal }}
