@@ -22,6 +22,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - uses: haskell/actions/setup@v1
+      with:
+        ghc-version: "8.10.5"
+        cabal-version: "3.4"
+
     - uses: actions/cache@v2
       name: Cache ~/.cabal/store
       with:
