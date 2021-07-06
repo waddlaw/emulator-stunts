@@ -12,8 +12,8 @@ module DeBruijn
 where
 
 import qualified Data.IntMap.Strict as IM
-import Data.Word
 import Data.Kind
+import Data.Word
 import Edsl
 import Unsafe.Coerce
 

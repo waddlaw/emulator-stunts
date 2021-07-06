@@ -18,8 +18,8 @@ import Data.Bits hiding (bit)
 import qualified Data.ByteString as BS
 import qualified Data.IntMap.Strict as IM
 import qualified Data.IntSet as IS
-import Data.List
 import Data.Kind
+import Data.List
 import Data.Maybe
 import Data.Monoid
 import qualified Data.Vector.Storable as US

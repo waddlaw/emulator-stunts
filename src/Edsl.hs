@@ -13,8 +13,8 @@ module Edsl where
 import Control.Applicative
 import Control.Monad
 import Data.Bits
-import Data.Kind
 import qualified Data.IntMap.Strict as IM
+import Data.Kind
 import Data.Word
 import Helper
 import Prelude
