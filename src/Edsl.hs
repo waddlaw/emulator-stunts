@@ -14,6 +14,7 @@ import Control.Applicative
 import Control.Monad
 import Data.Bits
 import qualified Data.IntMap.Strict as IM
+import Data.Kind
 import Data.Word
 import Helper
 import Prelude
@@ -98,7 +99,7 @@ mapPart f = \case
 
 --------------------------------------------------------------------------------
 
-data Exp_ (v :: * -> *) (c :: * -> * -> *) a where
+data Exp_ (v :: Type -> Type) (c :: Type -> Type -> Type) a where
   Var :: v a -> Exp_ v c a
   C :: a -> Exp_ v c a
   Let :: Exp_ v c a -> c a b -> Exp_ v c b
@@ -121,7 +122,7 @@ unTup :: Exp_ v c (a, b) -> (Exp_ v c a, Exp_ v c b)
 unTup x = (fst' x, snd' x)
 
 pattern Neg ::
-  forall (v :: * -> *) (c :: * -> * -> *) a.
+  forall (v :: Type -> Type) (c :: Type -> Type -> Type) a.
   () =>
   (Num a, Eq a) =>
   Exp_ v c a ->
@@ -129,7 +130,7 @@ pattern Neg ::
 pattern Neg a = Mul (C (-1)) a
 
 pattern Sub ::
-  forall (v :: * -> *) (c :: * -> * -> *) a.
+  forall (v :: Type -> Type) (c :: Type -> Type -> Type) a.
   () =>
   (Num a, Eq a) =>
   Exp_ v c a ->
@@ -269,7 +270,7 @@ type Part = Part_ Exp
 
 data List a = Con a (List a) | Nil
 
-data Var :: List * -> * -> * where
+data Var :: List Type -> Type -> Type where
   VarZ :: Var ('Con a e) a
   VarS :: Var e a -> Var ('Con b e) a
 
@@ -283,7 +284,7 @@ data Jump' = JumpAddr Word16 Word16
 
 type JumpInfo e = Either Bool ((Word16, Word16), IM.IntMap (e Jump'), e Jump')
 
-data ExpM_ (e :: * -> *) (c :: * -> * -> *) a where
+data ExpM_ (e :: Type -> Type) (c :: Type -> Type -> Type) a where
   Ret :: e a -> ExpM_ e c a
   Set :: Part_ e b -> e b -> ExpM_ e c a -> ExpM_ e c a
   Jump' :: JumpInfo (ExpM_ e c) -> e Word16 -> e Word16 -> ExpM_ e c Jump'
@@ -301,7 +302,7 @@ data ExpM_ (e :: * -> *) (c :: * -> * -> *) a where
   Trace :: String -> ExpM_ e c a -> ExpM_ e c a
 
 class CC c where
-  type Ex c :: * -> *
+  type Ex c :: Type -> Type
   cid :: c a a
   (.>=>) :: c a b -> (b -> ExM c x) -> c a x
 

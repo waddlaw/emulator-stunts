@@ -18,6 +18,7 @@ import Data.Bits hiding (bit)
 import qualified Data.ByteString as BS
 import qualified Data.IntMap.Strict as IM
 import qualified Data.IntSet as IS
+import Data.Kind
 import Data.List
 import Data.Maybe
 import Data.Monoid
@@ -188,7 +189,7 @@ evalPart__ = \case
 
 -------------
 
-data Env :: List * -> * where
+data Env :: List Type -> Type where
   Empty :: Env 'Nil
   Push :: {getPushEnv :: Env env, getPushVal :: t} -> Env ('Con t env)
 

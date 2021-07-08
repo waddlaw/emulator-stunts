@@ -12,13 +12,14 @@ module DeBruijn
 where
 
 import qualified Data.IntMap.Strict as IM
+import Data.Kind
 import Data.Word
 import Edsl
 import Unsafe.Coerce
 
 --------------------------
 
-data Layout :: List * -> List * -> * where
+data Layout :: List Type -> List Type -> Type where
   EmptyLayout :: Layout env 'Nil
   PushLayout :: Layout env env' -> Var env t -> Layout env ('Con t env')
 

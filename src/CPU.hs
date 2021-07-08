@@ -14,6 +14,7 @@ import Data.ByteString (ByteString)
 import Data.Int
 import qualified Data.IntMap.Strict as IM
 import qualified Data.IntSet as IS
+import Data.Kind
 import Data.List hiding (iterate')
 import Data.Maybe
 import Data.Word
@@ -23,7 +24,7 @@ import Helper
 
 --------------------------------------------------------------------------------
 
-type family Signed a :: *
+type family Signed a :: Type
 
 type instance Signed Word8 = Int8
 
@@ -33,7 +34,7 @@ type instance Signed Word32 = Int32
 
 type instance Signed Word64 = Int64
 
-type family X2 a :: *
+type family X2 a :: Type
 
 type instance X2 Word8 = Word16
 
